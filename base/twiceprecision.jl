@@ -480,11 +480,15 @@ convert(::Type{StepRangeLen{T,R,S}}, r::StepRangeLen{T,R,S}) where {T<:AbstractF
 convert(::Type{StepRangeLen{T,R,S}}, r::StepRangeLen) where {T<:AbstractFloat,R<:TwicePrecision,S<:TwicePrecision} =
     _convertSRL(StepRangeLen{T,R,S}, r)
 
+convert(::Type{StepRangeLen{Float64}}, r::StepRangeLen) =
+    _convertSRL(StepRangeLen{Float64,TwicePrecision{Float64},TwicePrecision{Float64}}, r)
 convert(::Type{StepRangeLen{T}}, r::StepRangeLen) where {T<:IEEEFloat} =
-    _convertSRL(StepRangeLen{T,TwicePrecision{T},TwicePrecision{T}}, r)
+    _convertSRL(StepRangeLen{T,Float64,Float64}, r)
 
+convert(::Type{StepRangeLen{Float64}}, r::Range) =
+    _convertSRL(StepRangeLen{Float64,TwicePrecision{Float64},TwicePrecision{Float64}}, r)
 convert(::Type{StepRangeLen{T}}, r::Range) where {T<:IEEEFloat} =
-    _convertSRL(StepRangeLen{T,TwicePrecision{T},TwicePrecision{T}}, r)
+    _convertSRL(StepRangeLen{T,Float64,Float64}, r)
 
 function _convertSRL(::Type{StepRangeLen{T,R,S}}, r::StepRangeLen{<:Integer}) where {T,R,S}
     StepRangeLen{T,R,S}(R(r.ref), S(r.step), length(r), r.offset)
@@ -674,6 +678,7 @@ function rat(x)
     return a, b
 end
 
+narrow(::Type{T}) where T<:AbstractFloat = Float64
 narrow(::Type{Float64}) = Float32
 narrow(::Type{Float32}) = Float16
 narrow(::Type{Float16}) = Float16
